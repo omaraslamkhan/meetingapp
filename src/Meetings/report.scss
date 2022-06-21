@@ -1,0 +1,169 @@
+.report_parent {
+  display: none;
+}
+
+table {
+  page-break-inside: auto;
+}
+tr {
+  page-break-inside: avoid;
+  page-break-after: auto;
+}
+
+.report {
+  margin-left: 15px;
+  font-size: 12px;
+
+  .page-footer,
+  .page-footer-space {
+    height: 50px;
+  }
+
+  .heading {
+    text-align: center;
+  }
+
+  @media print {
+    thead {
+      display: table-header-group;
+    }
+    tfoot {
+      display: table-footer-group;
+    }
+  }
+
+  .page-footer {
+    position: fixed;
+    bottom: 0;
+    right: 40px;
+    width: 100%;
+    text-align: end;
+  }
+
+  table,
+  th,
+  td {
+    border: 0.05px solid #0000003a;
+    border-collapse: collapse;
+  }
+
+  .enclosing-table {
+    border: none;
+  }
+
+  .enclosing-table-body {
+    border: none;
+  }
+
+  .participants-table {
+    th {
+      text-align: center;
+      padding: 10px;
+    }
+
+    .number-col {
+      width: 20px;
+    }
+
+    .name-col {
+      width: 200px;
+    }
+
+    .initials-col {
+      width: 40px;
+    }
+
+    .session-col {
+      width: 65px;
+      font-size: 0.65rem;
+    }
+
+    td {
+      padding: 10px 10px;
+    }
+  }
+
+  .mom-table {
+    margin-top: 50px;
+
+    th {
+      text-align: center;
+      padding: 10px 10px;
+    }
+
+    td {
+      padding: 10px 5px;
+      vertical-align: text-top;
+    }
+
+    font-weight: bold;
+
+    .number-col {
+      width: 10px;
+    }
+
+    .original-date-col {
+      width: 75px;
+    }
+
+    .task-number-col {
+      width: 15px;
+    }
+
+    .task-text-col {
+      width: 285px;
+    }
+
+    .reponsible-person-col {
+      width: 90px;
+    }
+
+    .target-date-col {
+      width: 80px;
+    }
+
+    .task-status-col {
+      width: 70px;
+    }
+
+    .points {
+      padding: 0px;
+      text-align: center;
+
+      table {
+        border: none;
+      }
+
+      td {
+        border-top: none;
+        border-bottom: none;
+      }
+
+      .original-date-col {
+        width: 85px;
+      }
+
+      .task-number-col {
+        width: 25px;
+      }
+
+      .task-text-col {
+        width: 295px;
+        font-weight: normal;
+        text-align: left;
+      }
+
+      .reponsible-person-col {
+        width: 100px;
+      }
+
+      .target-date-col {
+        width: 90px;
+      }
+
+      .task-status-col {
+        width: 80px;
+      }
+    }
+  }
+}
