@@ -15,6 +15,8 @@ import {
 import requestHeaders from "../_helpers/headers";
 import {BASE_URL} from '../config/productionConfig'
 import { DataGrid } from "@mui/x-data-grid";
+import axios from "axios";
+import moment from "moment";
 
 // const listFilters = (permissions) => {
 //   const isAdmin = permissions === "admin";
@@ -47,28 +49,20 @@ import { DataGrid } from "@mui/x-data-grid";
 
 const PointsList = (props) => {
   const [dataM, setDataM] = React.useState([]);
+  const [tasks, setTasks] = React.useState([])
   // const [localUserID, setLocalUserId] = React.useState('')
 
-  React.useEffect(() => {
-    const user = localStorage.getItem("user");
-    const parseData = JSON.parse(user);
-    // setLocalUserId(parseData.id)
-    // console.log(parseData.firstName + parseData.lastName);
-    // console.log(localUserID)
+  React.useEffect(async () => {
+    const tasks = await axios.get(`${BASE_URL}/points?_end=200&_order=ASC&_sort=id&_start=0`, {
+      headers: requestHeaders,
+    });
 
-    fetch(
-      `${BASE_URL}/points?_end=200&_order=ASC&_sort=id&_start=0`,
-      {
-        headers: requestHeaders,
-      }
-    )
-      .then((res) => res.json())
-      .then((apiRes) => {
-        setDataM(apiRes);
-        // console.log(apiRes);
-      })
-      .catch((err) => console.log(err.message));
+    setTasks(tasks.data);
   }, []);
+
+  React.useEffect(() => {
+    setDataM(tasks);
+  }, [tasks])
 
   //  console.log(dataM);
   //  console.log(email);
@@ -85,16 +79,49 @@ const PointsList = (props) => {
 
   // }))
 
+  const getStatus = (status) => {
+    switch(status) {
+      case 0: {
+        return "Not Started"
+      };
+      
+      case 1: {
+        return "In Progress"
+      };
+
+      case 2: {
+        return "Need Management Approval"
+      };
+
+      case 3: {
+        return "On Hold"
+      };
+
+      case 4: {
+        return "Completed"
+      };
+
+      case 5: {
+        return "Aborted/Closed"
+      };
+    }
+  }
+
+  const getDate = (date) => {
+    const customDate = moment(date).format("DD/MM/yyyy");
+    return customDate
+  }
+
   const assemList = dataM.map((assem) => {
     //const assemList = state.assembly.map((assem) => {
     return {
       id: assem.id,
       meetingTitle: assem.meetingTitle,
-      status: assem.status === 0 ? "Pending" : "Approved",
+      status: getStatus(assem.status),
       meeting: assem.meeting,
       text: assem.text,
-      originalDate:  assem.originalDate ? assem.originalDate.split("T")[0] : null,
-      targetDate: assem.targetDate ? assem.targetDate.split("T")[0] : null,
+      originalDate:  getDate(assem.originalDate),
+      targetDate: getDate(assem.targetDate),
       assignees: assem.assignees,
     };
   });
@@ -109,7 +136,7 @@ const PointsList = (props) => {
     { field: "originalDate", headerName: "Original Date", width: 150 },
     { field: "targetDate", headerName: "Target Date", width: 150 },
     { field: "assignees", headerName: "Responsible Persons", width: 200 },
-    { field: "status", headerName: "Stauts", width: 150 },
+    { field: "status", headerName: "Status", width: 150 },
   ];
 
   return (
