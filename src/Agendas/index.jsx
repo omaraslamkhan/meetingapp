@@ -800,6 +800,7 @@ const Agendas = (props) => {
                     </Button>
                     <Button
                       onClick={editAgenda}
+                      disabled
                       style={{ margin: 10 }}
                       variant="contained"
                     >
