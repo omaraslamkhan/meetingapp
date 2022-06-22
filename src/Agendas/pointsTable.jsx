@@ -181,6 +181,7 @@ export default function DataGridDemo(props) {
               variant="standard"
               multiline
               value={data.row.text}
+              placeholder={"Point description"}
               onChange={(e) => changePointText(e.target.value, data)}
               InputProps={{
                 disableUnderline: true,

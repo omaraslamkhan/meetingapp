@@ -178,7 +178,13 @@ const Agendas = (props) => {
     let newObject = {
       id: count,
       assignees: [],
-      points: [],
+      points: [{
+        id: 0,
+        originalDate: todayDate,
+        targetDate: todayDate,
+        status: 0,
+        text: '',
+      }],
     };
 
     updatedAgendas[0].tasks = [...updatedAgendas[0].tasks, newObject];
