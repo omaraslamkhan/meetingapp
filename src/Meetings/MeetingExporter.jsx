@@ -125,7 +125,7 @@ export const MeetingToPDF = (props) => {
                 <tr>
                   <td>{idx + 1}</td>
                   <td>{participant.firstName + " " + participant.lastName}</td>
-                  <td>{participant.initials}</td>
+                  <td>{participant.initial}</td>
                   {meeting.sessions.map((session) =>
                     session.participants.find(
                       (p) => p.id === participant.id
@@ -199,7 +199,7 @@ export const MeetingToPDF = (props) => {
                                 {(() => {
                                   let initials = task.assignees.map(
                                     (assignee) =>
-                                      participants.get(assignee.id).initials
+                                      participants.get(assignee.id).initial
                                   );
                                   return initials.reduce(
                                     (reponsiblePersonText, initial) =>
