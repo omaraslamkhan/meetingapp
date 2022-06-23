@@ -50,6 +50,7 @@ export default function DataGridDemo() {
     organizer: null,
     department: null,
   });
+  
   const history = useHistory();
 
   React.useEffect(async () => {
@@ -64,7 +65,7 @@ export default function DataGridDemo() {
     setUsersList(users.data);
     setDepartmentsList(departments.data);
   }, []);
-
+// console.log(usersList);
   const fetchMeetings = async () => {
     const fetchedMeetings = await accountService.find(
       "",
@@ -77,9 +78,10 @@ export default function DataGridDemo() {
   React.useEffect(() => {
     fetchMeetings();
   }, []);
-
+console.log(allMeetings);
   React.useEffect(() => {
     if (allMeetings.length) {
+      console.log('all meting.length', allMeetings);
       const user = localStorage.getItem("user");
       const parsedUser = JSON.parse(user);
 
@@ -342,11 +344,11 @@ export default function DataGridDemo() {
               >
                 + Add Meeting
               </Link> */}
-                + Add Meeting
+                 Add Meeting
               </Button>
             )}
 
-            {disableOperations && (
+            {!disableOperations && (
               <FilterAltIcon
                 variant="contained"
                 onClick={showFilters}

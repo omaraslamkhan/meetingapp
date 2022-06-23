@@ -13,7 +13,7 @@ const FilterSection = (props) => {
   const [usersList, setUsersList] = React.useState([]);
 
   React.useEffect(() => {
-    //console.log(props.filters);
+    console.log(props);
     setDepartment(props.filters.department)
     setOrganizer(props.filters.organizer)
   }, []);
