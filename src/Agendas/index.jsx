@@ -88,7 +88,7 @@ const Agendas = (props) => {
   const [loadingAgendas, setLoadingAgendas] = React.useState(false);
   const [organizerName, setOrganizerName] = React.useState("");
   const [meetingName, setMeetingName] = React.useState("");
-  const [todayDate, setTodayDate] = React.useState("dd/MM/yyyy");
+  const [todayDate, setTodayDate] = React.useState(null);
   const [users, setUsers] = React.useState([]);
   const [meetingDetails, setMeetingDetails] = React.useState({});
   const [newlyAddedAgendaIDs, setNewlyAddedAgendaIDs] = React.useState([]);
@@ -180,8 +180,8 @@ const Agendas = (props) => {
       assignees: [],
       points: [{
         id: 0,
-        originalDate: todayDate,
-        targetDate: todayDate,
+        originalDate: null,
+        targetDate: null,
         status: 0,
         text: '',
       }],
@@ -468,8 +468,8 @@ const Agendas = (props) => {
           if (task.id == taskID) {
             let newPoint = {
               id: task.points.length,
-              originalDate: todayDate,
-              targetDate: todayDate,
+              originalDate: null,
+              targetDate: null,
               status: 0,
               text: point,
             };

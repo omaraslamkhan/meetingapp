@@ -222,7 +222,7 @@ export default function DataGridDemo(props) {
         //   onChange={(event) => changeAssignedDate(event.target.value, data)}
         // />
         <DesktopDatePicker
-          value={new Date(data.row.originalDate)}
+          value={data.row.originalDate}
           inputFormat="dd/MM/yyyy"
           onChange={(changedDate) => changeAssignedDate(changedDate, data)}
           renderInput={(props) => <TextField {...props} />}
@@ -244,7 +244,7 @@ export default function DataGridDemo(props) {
         //   onChange={(event) => changeTargetDate(event.target.value, data)}
         // />
         <DesktopDatePicker
-          value={new Date(data.row.targetDate)}
+          value={data.row.targetDate}
           inputFormat="dd/MM/yyyy"
           onChange={(changedDate) => changeTargetDate(changedDate, data)}
           renderInput={(props) => <TextField {...props} />}

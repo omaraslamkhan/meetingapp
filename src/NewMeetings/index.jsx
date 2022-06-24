@@ -79,28 +79,19 @@ export default function DataGridDemo() {
   }, []);
 
   React.useEffect(() => {
-    if (allMeetings.length) {
-      const user = localStorage.getItem("user");
-      const parsedUser = JSON.parse(user);
+    const user = localStorage.getItem("user");
+    const parsedUser = JSON.parse(user);
 
-      const filteredMeetings = allMeetings.filter((item) => {
-        return item.organizer.id == parsedUser.id;
-      });
+    setMeetings(allMeetings);
+    setOriginalMeetings(allMeetings);
 
-      if (
-        parsedUser.id == 934 ||
-        parsedUser.id == 984 ||
-        parsedUser.id == 994 ||
-        parsedUser.id == 1054
-      ) {
-        setMeetings(allMeetings);
-        setOriginalMeetings(allMeetings);
-        setDisableOperations(true);
-      } else {
-        setMeetings(filteredMeetings);
-        setOriginalMeetings(filteredMeetings);
-      }
-      //console.log(filteredMeetings)
+    if (
+      parsedUser.id == 934 ||
+      parsedUser.id == 984 ||
+      parsedUser.id == 994 ||
+      parsedUser.id == 1054
+    ) {
+      setDisableOperations(true);
     }
   }, [allMeetings]);
 

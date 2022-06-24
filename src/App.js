@@ -6,7 +6,7 @@ import AdapterDateFns from "@mui/lab/AdapterDateFns";
 import LocalizationProvider from "@mui/lab/LocalizationProvider";
 
 import { ListMeeting, EditMeeting, CreateMeeting } from "./Meetings";
-import { PointsList } from "./Points";
+import Tasks from "./Points";
 import Login from "./Auth/Login";
 import LogoutButton from "./Auth/LogoutButton";
 import { UserList } from "./users";
@@ -66,7 +66,7 @@ const App = () => {
           ),
           <Resource name="departments" />,
           <Resource name="agendas" />,
-          <Resource name="points" icon={CalendarIcon} list={PointsList} />,
+          <Resource name="points" icon={CalendarIcon} list={Tasks} />,
         ]}
       </Admin>
     </LocalizationProvider>

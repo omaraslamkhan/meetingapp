@@ -13,10 +13,11 @@ import {
   usePermissions,
 } from "react-admin";
 import requestHeaders from "../_helpers/headers";
-import {BASE_URL} from '../config/productionConfig'
+import { BASE_URL } from "../config/productionConfig";
 import { DataGrid } from "@mui/x-data-grid";
 import axios from "axios";
 import moment from "moment";
+import { CSVLink } from "react-csv";
 
 // const listFilters = (permissions) => {
 //   const isAdmin = permissions === "admin";
@@ -49,20 +50,32 @@ import moment from "moment";
 
 const PointsList = (props) => {
   const [dataM, setDataM] = React.useState([]);
-  const [tasks, setTasks] = React.useState([])
+  const [tasks, setTasks] = React.useState([]);
   // const [localUserID, setLocalUserId] = React.useState('')
 
+  const headers = [
+    { key: "meetingTitle", label: "Meeting Title" },
+    { key: "text", label: "Task" },
+    { key: "originalDate", label: "Original Date" },
+    { key: "targetDate", label: "Target Date" },
+    { key: "assignees", label: "Responsible Persons" },
+    { key: "status", label: "Status" },
+  ];
+
   React.useEffect(async () => {
-    const tasks = await axios.get(`${BASE_URL}/points?_end=200&_order=ASC&_sort=id&_start=0`, {
-      headers: requestHeaders,
-    });
+    const tasks = await axios.get(
+      `${BASE_URL}/points?_end=200&_order=ASC&_sort=id&_start=0`,
+      {
+        headers: requestHeaders,
+      }
+    );
 
     setTasks(tasks.data);
   }, []);
 
   React.useEffect(() => {
     setDataM(tasks);
-  }, [tasks])
+  }, [tasks]);
 
   //  console.log(dataM);
   //  console.log(email);
@@ -80,37 +93,37 @@ const PointsList = (props) => {
   // }))
 
   const getStatus = (status) => {
-    switch(status) {
+    switch (status) {
       case 0: {
-        return "Not Started"
-      };
-      
+        return "Not Started";
+      }
+
       case 1: {
-        return "In Progress"
-      };
+        return "In Progress";
+      }
 
       case 2: {
-        return "Need Management Approval"
-      };
+        return "Need Management Approval";
+      }
 
       case 3: {
-        return "On Hold"
-      };
+        return "On Hold";
+      }
 
       case 4: {
-        return "Completed"
-      };
+        return "Completed";
+      }
 
       case 5: {
-        return "Aborted/Closed"
-      };
+        return "Aborted/Closed";
+      }
     }
-  }
+  };
 
   const getDate = (date) => {
     const customDate = moment(date).format("DD/MM/yyyy");
-    return customDate
-  }
+    return customDate;
+  };
 
   const assemList = dataM.map((assem) => {
     //const assemList = state.assembly.map((assem) => {
@@ -120,7 +133,7 @@ const PointsList = (props) => {
       status: getStatus(assem.status),
       meeting: assem.meeting,
       text: assem.text,
-      originalDate:  getDate(assem.originalDate),
+      originalDate: getDate(assem.originalDate),
       targetDate: getDate(assem.targetDate),
       assignees: assem.assignees,
     };
@@ -155,6 +168,9 @@ const PointsList = (props) => {
           }}
         >
           <h2 style={{ marginTop: "-5px", textAlign: "center" }}>Tasks</h2>
+          <CSVLink data={assemList} headers={headers} filename={"tasks.csv"}>
+            Download me
+          </CSVLink>
 
           {loading ? null : (
             <div style={{ height: 400, width: "100%" }}>

@@ -38,7 +38,7 @@ const participantStyle = {
 
 export default function DataGridDemo(props) {
   const [sessions, setSessions] = React.useState([]);
-  const [sessionDate, setSessionDate] = React.useState("dd/MM/yyyy");
+  const [sessionDate, setSessionDate] = React.useState(null);
   const [modal, setModal] = React.useState(false);
   const [selectedSession, setSelectedSession] = React.useState();
   const [update, setUpdate] = React.useState(false);
@@ -292,7 +292,7 @@ export default function DataGridDemo(props) {
     setSessions(newSessions);
     setNewlyAddedSessionsIDs(newly);
     setDateChanged(true);
-    setSessionDate("dd/MM/yyyy");
+    setSessionDate(null);
     if (props?.getSessions) {
       props.getSessions(newSessions);
     }
