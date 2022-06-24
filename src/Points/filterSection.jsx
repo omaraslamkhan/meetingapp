@@ -155,8 +155,6 @@ const FilterSection = (props) => {
   const filterAssignedDate = (data) => {
     let filteredAssignedDate = [];
 
-    console.log(assignedDate);
-
     if (assignedDate != null) {
       filteredAssignedDate = data.filter((item) => {
         return item.originalDate == moment(assignedDate).format("DD/MM/yyyy");
