@@ -27,6 +27,10 @@ const CreateMeeting = () => {
   const [originalDepartments, setOriginalDepartments] = useState([]);
   const history = useHistory();
 
+  React.useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [])
+
   useEffect(async () => {
     let customDepartments = [];
 

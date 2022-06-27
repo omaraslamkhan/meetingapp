@@ -52,6 +52,10 @@ export default function DataGridDemo() {
   });
   const history = useHistory();
 
+  React.useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [])
+
   React.useEffect(async () => {
     const users = await axios.get(`${BASE_URL}/users`, {
       headers: requestHeaders,

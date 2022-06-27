@@ -9,7 +9,7 @@ import { Link, useHistory } from "react-router-dom";
 import CustomButton from "../Generic/Button";
 import requestHeaders from "../_helpers/headers";
 import Notification from "../Generic/Notification";
-import {BASE_URL} from '../config/productionConfig'
+import { BASE_URL } from "../config/productionConfig";
 
 const UpdateMeeting = () => {
   const [meetingName, setMeetingName] = useState("");
@@ -26,6 +26,10 @@ const UpdateMeeting = () => {
   const [notificationText, setNotificationText] = useState("");
   const [notificationType, setNotificationType] = useState("");
   const history = useHistory();
+
+  React.useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   useEffect(async () => {
     const customizedUsers = [];
@@ -196,8 +200,8 @@ const UpdateMeeting = () => {
   };
 
   const meetingSessions = (data) => {
-    setSessions(data)
-  }
+    setSessions(data);
+  };
 
   const getDeleted = (sessionID) => {
     const updatedList = sessions.filter((item) => {
@@ -205,7 +209,7 @@ const UpdateMeeting = () => {
     });
 
     setSessions(updatedList);
-  }
+  };
 
   return (
     <div>
