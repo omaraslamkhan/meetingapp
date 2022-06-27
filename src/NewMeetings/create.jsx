@@ -8,7 +8,7 @@ import CustomButton from "../Generic/Button";
 import { Link, useHistory } from "react-router-dom";
 import requestHeaders from "../_helpers/headers";
 import Notification from "../Generic/Notification";
-import {BASE_URL} from '../config/productionConfig'
+import { BASE_URL } from "../config/productionConfig";
 
 const CreateMeeting = () => {
   const [meetingName, setMeetingName] = useState("");
@@ -20,10 +20,16 @@ const CreateMeeting = () => {
   const [notificationState, setNotificationState] = useState(false);
   const [notificationText, setNotificationText] = useState("");
   const [notificationType, setNotificationType] = useState("");
-  const [sessions, setSessions] = useState([])
+  const [sessions, setSessions] = useState([]);
+  const [disableDepartment, setDisableDepartment] = useState(true);
+  const [userObject, setUserObject] = useState();
+  const [departmentObject, setDepartmentObject] = useState();
+  const [originalDepartments, setOriginalDepartments] = useState([]);
   const history = useHistory();
 
   useEffect(async () => {
+    let customDepartments = [];
+
     const departments = await axios.get(`${BASE_URL}/departments`, {
       headers: requestHeaders,
     });
@@ -31,8 +37,18 @@ const CreateMeeting = () => {
       headers: requestHeaders,
     });
 
+    departments.data.map((item) => {
+      let newObject = {
+        id: item.id,
+        label: item.name,
+      };
+
+      customDepartments.push(newObject);
+    });
+
     setUsersList(users.data);
-    setDepartmentsList(departments.data);
+    setDepartmentsList(customDepartments);
+    setOriginalDepartments(departments.data);
   }, []);
 
   useEffect(() => {
@@ -41,43 +57,55 @@ const CreateMeeting = () => {
         return item.id == JSON.parse(localStorage.getItem("user")).id;
       });
 
-      const selectedDepartment = departmentsList.filter((item) => {
-        return item.id == selectedOrganizer[0].department.id;
-      });
+      setUserObject(selectedOrganizer[0]);
 
       const organizer = {
         id: selectedOrganizer[0].id,
         label: selectedOrganizer[0].title,
       };
 
-      const department = {
-        id: selectedDepartment[0].id,
-        label: selectedDepartment[0].name,
-      };
-
       setOrganizer(organizer);
-      setDepartment(department);
+
+      if (selectedOrganizer[0].department == null) {
+        setDisableDepartment(false);
+      } else {
+        const selectedDepartment = departmentsList.filter((item) => {
+          return item.id == selectedOrganizer[0].department.id;
+        });
+
+        const department = {
+          id: selectedDepartment[0].id,
+          label: selectedDepartment[0].label,
+        };
+
+        setDepartment(department);
+      }
     }
   }, [usersList, departmentsList]);
 
   useEffect(() => {
-    if (meetingName.length) {
+    if (meetingName.length && department != null) {
       setCheck(false);
     } else {
       setCheck(true);
     }
-  }, [meetingName]);
+  }, [meetingName, department]);
 
-  // const getDepartment = (data) => {
-  //   if (data != null) {
-  //     const selected = departmentsList.filter((item) => {
-  //       return item.id == data.id;
-  //     });
-  //     setDepartment(selected[0]);
-  //   } else {
-  //     setDepartment(null);
-  //   }
-  // };
+  const getDepartment = (data) => {
+    if (data != null) {
+      const selected = departmentsList.filter((item) => {
+        return item.id == data.id;
+      });
+      setDepartment(selected[0]);
+
+      const selectedDepartmentObject = originalDepartments.filter((item) => {
+        return item.id == data.id;
+      });
+      setDepartmentObject(selectedDepartmentObject[0]);
+    } else {
+      setDepartment(null);
+    }
+  };
 
   const getMeetingSessions = async (data) => {
     let meetingObject = {
@@ -92,15 +120,25 @@ const CreateMeeting = () => {
     };
 
     //console.log(meetingObject);
-    const res = await axios.post(
-      `${BASE_URL}/meetings`,
-      meetingObject,
-      {
-        headers: requestHeaders,
-      }
-    );
+    const res = await axios.post(`${BASE_URL}/meetings`, meetingObject, {
+      headers: requestHeaders,
+    });
 
-    console.log(res);
+    if (!disableDepartment) {
+      const updatedUser = { ...userObject, department: departmentObject };
+
+      const updateUserDepartment = await axios.put(
+        `${BASE_URL}/users/${organizer.id}`,
+        updatedUser,
+        {
+          headers: requestHeaders,
+        }
+      );
+
+      console.log(updateUserDepartment);
+    }
+
+    //console.log(res);
 
     if (res?.status == 200) {
       localStorage.setItem("meetingID", res.data.id);
@@ -128,8 +166,8 @@ const CreateMeeting = () => {
   };
 
   const meetingSessions = (data) => {
-    setSessions(data)
-  }
+    setSessions(data);
+  };
 
   const getDeleted = (sessionID) => {
     const updatedList = sessions.filter((item) => {
@@ -137,7 +175,7 @@ const CreateMeeting = () => {
     });
 
     setSessions(updatedList);
-  }
+  };
 
   return (
     <div>
@@ -194,9 +232,9 @@ const CreateMeeting = () => {
               id="combo-box-demo"
               options={departmentsList}
               value={department}
-              disabled
+              disabled={disableDepartment}
               style={{ margin: "5px 0px" }}
-              //onChange={(event, value) => getDepartment(value)}
+              onChange={(event, value) => getDepartment(value)}
               sx={{ width: "95%" }}
               renderInput={(params) => (
                 <TextField {...params} label="Department" />

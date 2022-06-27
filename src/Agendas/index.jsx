@@ -102,6 +102,10 @@ const Agendas = (props) => {
   const [selectedAgendaID, setSelectedAgendaID] = React.useState();
   const history = useHistory();
 
+  React.useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [])
+
   React.useEffect(async () => {
     const meetingID = localStorage.getItem("meetingID");
 

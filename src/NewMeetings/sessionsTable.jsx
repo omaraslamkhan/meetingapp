@@ -49,6 +49,7 @@ export default function DataGridDemo(props) {
   const [disableSave, setDisableSave] = React.useState(false);
   const [sure, setSure] = React.useState(false);
   const [selectedSessionID, setSelectedSessionID] = React.useState();
+  const [disableAgendas, setDisableAgendas] = React.useState(false)
   const history = useHistory();
 
   React.useEffect(() => {
@@ -58,6 +59,12 @@ export default function DataGridDemo(props) {
       setSessions(props.createMeetingSessions);
     }
   }, [props]);
+
+  React.useEffect(() => {
+    if(!localStorage.getItem("meetingID")) {
+      setDisableAgendas(true)
+    }
+  })
 
   React.useEffect(() => {
     var date = new Date();
@@ -336,7 +343,7 @@ export default function DataGridDemo(props) {
       setTimeout(() => {
         setNotificationState(false);
       }, 5000);
-    } else {
+    } else if(data != null) {
       setSessionDate(data);
       setDateChanged(false);
     }
@@ -416,7 +423,7 @@ export default function DataGridDemo(props) {
             onClick={goToAgendas}
             variant="contained"
             style={{ position: "absolute", bottom: 0 }}
-            disabled={!localStorage.getItem("meetingID")}
+            disabled={disableAgendas}
           >
             {/* <Link
               to="/agendas"
