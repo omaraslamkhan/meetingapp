@@ -15,6 +15,7 @@ export default function Participants(props) {
   const [displayParticipants, setDisplayParticipants] = React.useState([]);
   const [closeModal, setCloseModal] = React.useState(true);
   const [names, setNames] = React.useState([]);
+  const focusSave = React.useRef();
 
   React.useEffect(async () => {
     const users = await axios.get(`${BASE_URL}/users`, {
@@ -98,6 +99,8 @@ export default function Participants(props) {
       setDisplayParticipants(display);
       addedParticipants.push(data.id);
     }
+
+    focusSave.current.focus();
   };
 
   const removeParticipant = (data) => {
@@ -165,6 +168,7 @@ export default function Participants(props) {
         <Autocomplete
           disablePortal
           id="combo-box-demo"
+          value={null}
           style={{ margin: "10px 0px" }}
           onChange={(event, value) => getParticipant(value)}
           options={availableParticipants}
@@ -177,6 +181,7 @@ export default function Participants(props) {
         <div style={{ display: "inline-block" }}>
           <Button
             onClick={addParticipants}
+            ref={focusSave}
             style={{ marginTop: 20, marginRight: 10, width: "20px" }}
             variant="contained"
           >
