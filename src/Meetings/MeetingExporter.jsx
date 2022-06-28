@@ -16,6 +16,27 @@ export const MeetingToPDF = (props) => {
   const [meeting, setMeeting] = useState(null);
   const [participants, setParticipants] = useState(null);
 
+  const sortParticipants = (participants) => {
+    let orderedParticipants = Array.from(participants.values()).sort(function (
+      a,
+      b
+    ) {
+      if (
+        a?.firstName.toLowerCase().trim() < b?.firstName.toLowerCase().trim()
+      ) {
+        return -1;
+      }
+      if (
+        a?.firstName.toLowerCase().trim() > b?.firstName.toLowerCase().trim()
+      ) {
+        return 1;
+      }
+      return 0;
+    });
+
+    return orderedParticipants;
+  };
+
   useEffect(() => {
     const meetingId = props.match.params.meetingId;
     fetch(`${process.env.REACT_APP_URI}/meetings/report/` + meetingId)
@@ -52,8 +73,14 @@ export const MeetingToPDF = (props) => {
           participant.initials = i;
         }
 
+        const customParticipants = new Map(
+          sortParticipants(participants).map((participant) => {
+            return [participant.id, participant];
+          })
+        );
+
         setMeeting(meetingResp);
-        setParticipants(participants);
+        setParticipants(customParticipants);
       });
   }, []);
 

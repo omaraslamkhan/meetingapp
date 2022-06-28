@@ -214,6 +214,9 @@ const CreateMeeting = () => {
               style={{ margin: "1px 0px", width: "95%" }}
               variant="outlined"
               value={meetingName}
+              inputProps={{
+                spellCheck: true,
+              }}
               onChange={(event) => setMeetingName(event.target.value)}
             />
 

@@ -265,6 +265,18 @@ const Tasks = (props) => {
     setSure(false);
   };
 
+  const disableNewPoint = (points) => {
+    let check = false
+
+    points.map((point) => {
+      if(point.text == '') {
+        check = true
+      }
+    })
+
+    return check
+  }
+
   return tasks.map((item, index) => {
     return (
       <Accordion>
@@ -284,6 +296,7 @@ const Tasks = (props) => {
               style={{
                 marginRight: 10,
               }}
+              disabled={disableNewPoint(item.points)}
               variant="contained"
             >
               + Add Point

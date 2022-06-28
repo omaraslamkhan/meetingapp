@@ -19,7 +19,7 @@ import { Link, useHistory } from "react-router-dom";
 import CustomButton from "../Generic/Button";
 import requestHeaders from "../_helpers/headers";
 import Notification from "../Generic/Notification";
-import {BASE_URL} from '../config/productionConfig'
+import { BASE_URL } from "../config/productionConfig";
 
 const modalStyle = {
   position: "absolute",
@@ -104,7 +104,7 @@ const Agendas = (props) => {
 
   React.useEffect(() => {
     window.scrollTo(0, 0);
-  }, [])
+  }, []);
 
   React.useEffect(async () => {
     const meetingID = localStorage.getItem("meetingID");
@@ -182,13 +182,15 @@ const Agendas = (props) => {
     let newObject = {
       id: count,
       assignees: [],
-      points: [{
-        id: 0,
-        originalDate: null,
-        targetDate: null,
-        status: 0,
-        text: '',
-      }],
+      points: [
+        {
+          id: 0,
+          originalDate: null,
+          targetDate: null,
+          status: 0,
+          text: "",
+        },
+      ],
     };
 
     updatedAgendas[0].tasks = [...updatedAgendas[0].tasks, newObject];
@@ -251,6 +253,9 @@ const Agendas = (props) => {
               variant="outlined"
               multiline
               rows={5}
+              inputProps={{
+                spellCheck: true,
+              }}
               value={newAgenda}
               style={{ width: "100%" }}
               onChange={(e) => setNewAgenda(e.target.value)}
@@ -431,7 +436,23 @@ const Agendas = (props) => {
       return agenda;
     });
 
-    const updatedMeeting = { ...meetingDetails, agendas: customAgendas };
+    const checkedTasks = customAgendas.map((agenda) => {
+      agenda.tasks.map((task) => {
+
+        if(!task.points.length) {
+          let index = agenda.tasks.indexOf(task)
+          agenda.tasks.splice(index, 1)
+        }
+
+        return task
+      })
+
+      return agenda
+    })
+
+    //console.log(checkedTasks)
+
+    const updatedMeeting = { ...meetingDetails, agendas: checkedTasks };
     const res = await axios.put(
       `${BASE_URL}/meetings/${meetingDetails.id}`,
       updatedMeeting,

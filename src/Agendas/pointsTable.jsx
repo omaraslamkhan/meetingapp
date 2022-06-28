@@ -185,6 +185,7 @@ export default function DataGridDemo(props) {
               onChange={(e) => changePointText(e.target.value, data)}
               InputProps={{
                 disableUnderline: true,
+                spellCheck: true,
                 style: {
                   fontSize: 12,
                 },

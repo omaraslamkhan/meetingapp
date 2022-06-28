@@ -123,6 +123,7 @@ export default function DataGridDemo(props) {
           display: "flex",
           flexWrap: "wrap",
           overflowY: "scroll",
+          height: '90px'
         }}
       >
         {!participants.length ? (
