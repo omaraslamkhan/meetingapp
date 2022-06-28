@@ -12,6 +12,7 @@ import Fade from "@mui/material/Fade";
 import FilterSection from "./filterSection";
 import { BASE_URL } from "../config/productionConfig";
 import FilterAltIcon from "@mui/icons-material/FilterAlt";
+import moment from "moment";
 
 const sureStyle = {
   position: "absolute",
@@ -54,7 +55,7 @@ export default function DataGridDemo() {
 
   React.useEffect(() => {
     window.scrollTo(0, 0);
-  }, [])
+  }, []);
 
   React.useEffect(async () => {
     const users = await axios.get(`${BASE_URL}/users`, {
@@ -116,6 +117,10 @@ export default function DataGridDemo() {
     console.log(data);
   };
 
+  const getCustomDate = (date) => {
+    return moment(date).format("DD/MM/yyyy");
+  };
+
   const columns = [
     //   { field: 'id', headerName: 'ID', width: 90 },
     {
@@ -142,6 +147,20 @@ export default function DataGridDemo() {
       renderCell: (data) => (
         <span>
           {data.row.organizer.firstName + " " + data.row.organizer.lastName}
+        </span>
+      ),
+    },
+    {
+      field: "meetingDate",
+      headerName: <b>Meeting Date</b>,
+      width: 200,
+      disableColumnMenu: true,
+      sortable: false,
+      renderCell: (data) => (
+        <span>
+          {data.row.sessions.length
+            ? getCustomDate(data.row.sessions[0].startDate)
+            : "No Sessions"}
         </span>
       ),
     },
