@@ -11,11 +11,13 @@ import Modal from "@mui/material/Modal";
 import Fade from "@mui/material/Fade";
 import FilterSection from "./filterSection";
 import { BASE_URL } from "../config/productionConfig";
+import CircularProgress from "@mui/material/CircularProgress";
 import { TextField } from "@mui/material";
 import FilterAltIcon from "@mui/icons-material/FilterAlt";
 import DownloadIcon from "@mui/icons-material/Download";
 import moment from "moment";
 import { CSVLink } from "react-csv";
+var xlsx = require("xlsx");
 
 const filterStyle = {
   position: "absolute",
@@ -37,10 +39,12 @@ export default function DataGridDemo() {
   const [usersList, setUsersList] = React.useState([]);
   const [departmentsList, setDepartmentsList] = React.useState([]);
   const [originalTasks, setOriginalTasks] = React.useState([]);
+  const [loading, setLoading] = React.useState(true);
+  const [subOrdinateTasks, setSubOrdinateTasks] = React.useState([]);
   const [currentFilters, setCurrentFilters] = React.useState({
     organizer: null,
     department: null,
-    status: '',
+    status: "",
     assignedDate: null,
     dueDate: null,
   });
@@ -70,13 +74,65 @@ export default function DataGridDemo() {
   }, []);
 
   const fetchTasks = async () => {
+    const user = localStorage.getItem("user");
+    const parsedUser = JSON.parse(user);
+
     const fetchedTasks = await accountService.find(
       "",
       "points?_end=1000&_order=ASC&_sort=id&_start=0"
     );
 
-    setAllTasks(fetchedTasks.data);
+    const finalTasks = fetchedTasks.data;
+
+    if (parsedUser.hasAdminRights == false) {
+      const reportingUsers = usersList.filter((user) => {
+        return user.reportingTo == parsedUser.id;
+      });
+
+      reportingUsers.map(async (person) => {
+        const tasks = await axios.get(
+          `${BASE_URL}/points?_end=1000&_order=ASC&_sort=id&_start=0`,
+          {
+            headers: {
+              userid: person.id,
+            },
+          }
+        );
+
+        setSubOrdinateTasks(tasks.data);
+        subOrdinateTasks.map((item) => {
+          finalTasks.push(item);
+        });
+      });
+
+      setAllTasks(finalTasks);
+    } else {
+      setAllTasks(finalTasks);
+    }
+
+    setLoading(false);
   };
+
+  React.useEffect(() => {
+    let customTasks = tasks;
+
+    subOrdinateTasks.map((item) => {
+      let newObject = {
+        ...item,
+        assigneeIDs: getAssigneeIDs(item.assigneeEmail),
+        departmentID: getDepartmentID(item.meeting),
+        departmentName: getDepartmentName(item.meeting),
+        originalDate: moment(item.originalDate).format("DD/MM/yyyy"),
+        targetDate: moment(item.targetDate).format("DD/MM/yyyy"),
+        status: getStatus(item.status),
+        statusID: item.status,
+      };
+      customTasks = [...customTasks, newObject];
+    });
+
+    setTasks(customTasks);
+    setOriginalTasks(customTasks);
+  }, [subOrdinateTasks]);
 
   const fetchMeetings = async () => {
     const fetchedMeetings = await accountService.find(
@@ -90,7 +146,7 @@ export default function DataGridDemo() {
   React.useEffect(() => {
     fetchTasks();
     fetchMeetings();
-  }, []);
+  }, [usersList]);
 
   const getDepartmentID = (meetingID) => {
     const departmentID = allMeetings.filter((item) => {
@@ -135,10 +191,10 @@ export default function DataGridDemo() {
         assigneeIDs: getAssigneeIDs(item.assigneeEmail),
         departmentID: getDepartmentID(item.meeting),
         departmentName: getDepartmentName(item.meeting),
-        originalDate:  moment(item.originalDate).format("DD/MM/yyyy"),
-        targetDate:  moment(item.targetDate).format("DD/MM/yyyy"),
-        status:  getStatus(item.status),
-        statusID: item.status
+        originalDate: moment(item.originalDate).format("DD/MM/yyyy"),
+        targetDate: moment(item.targetDate).format("DD/MM/yyyy"),
+        status: getStatus(item.status),
+        statusID: item.status,
       };
       customTasks.push(newObject);
     });
@@ -353,11 +409,334 @@ export default function DataGridDemo() {
     setCurrentFilters(data);
   };
 
+  const getDepartment = (department) => {
+    switch (department) {
+      case "field force": {
+        return 10;
+      }
+
+      case "fieldforce": {
+        return 10;
+      }
+
+      case "sales & marketing (human)": {
+        return 11;
+      }
+
+      case "sales & marketing (export)": {
+        return 14;
+      }
+
+      case "product development": {
+        return 22;
+      }
+
+      case "pd": {
+        return 29;
+      }
+
+      case "medico marketing": {
+        return 36;
+      }
+
+      case "quality assurance": {
+        return 23;
+      }
+
+      case "information solutions": {
+        return 5;
+      }
+
+      case "information solution": {
+        return 5;
+      }
+
+      case "administration department": {
+        return 21;
+      }
+
+      case "adminstration department": {
+        return 21;
+      }
+
+      case "warehouse (fgs)": {
+        return 18;
+      }
+
+      case "general management": {
+        return 12;
+      }
+
+      case "production": {
+        return 5;
+      }
+
+      case "finance": {
+        return 3;
+      }
+
+      case "medical and regulatory": {
+        return 11;
+      }
+
+      case "information technology / m.i.s": {
+        return 9;
+      }
+
+      case "human resources": {
+        return 7;
+      }
+
+      case "human resource": {
+        return 7;
+      }
+
+      case "maintenance & engg.": {
+        return 25;
+      }
+
+      case "maintainance & engg.": {
+        return 25;
+      }
+
+      case "quality control": {
+        return 26;
+      }
+
+      case "marketing i-force": {
+        return 17;
+      }
+
+      case "material management": {
+        return 15;
+      }
+
+      case "sales and marketing": {
+        return 2;
+      }
+
+      case "indenting field": {
+        return 19;
+      }
+
+      case "medical and regulatory affairs": {
+        return 16;
+      }
+
+      case "medical & regulatory affairs": {
+        return 16;
+      }
+
+      case "factory purchase": {
+        return 27;
+      }
+
+      case "factory administration": {
+        return 4;
+      }
+
+      case "medical affairs": {
+        return 24;
+      }
+
+      case "marketing": {
+        return 20;
+      }
+
+      case "sales & marketing (vet)": {
+        return 13;
+      }
+
+      case "storage raw/ packing material": {
+        return 35;
+      }
+
+      case "distribution department": {
+        return 8;
+      }
+
+      case "store (fact)": {
+        return 17;
+      }
+
+      case "engineering department": {
+        return 24;
+      }
+
+      case "management": {
+        return 1;
+      }
+
+      case "internal audit": {
+        return 6;
+      }
+
+      case "quality operation": {
+        return 28;
+      }
+
+      case "sfe & sales support department": {
+        return 33;
+      }
+
+      case "sfe & sales support": {
+        return 43;
+      }
+
+      case "sfe + sales support function": {
+        return 39;
+      }
+
+      case "engineering administration": {
+        return 38;
+      }
+
+      case "hrsg": {
+        return 36;
+      }
+
+      case "management services": {
+        return 41;
+      }
+
+      case "human resource division": {
+        return 40;
+      }
+
+      case "regulatory affairs": {
+        return 39;
+      }
+
+      case "indenting": {
+        return 32;
+      }
+
+      case "admin assitant": {
+        return 41;
+      }
+
+      case "sterile area": {
+        return 31;
+      }
+
+      case "sales & marketing international division": {
+        return 42;
+      }
+
+      case "business development": {
+        return 34;
+      }
+
+      case "engineering": {
+        return 45;
+      }
+
+      case "corporate projects": {
+        return 46;
+      }
+
+      case "corporate communications": {
+        return 37;
+      }
+
+      case "test department": {
+        return 47;
+      }
+
+      case "sales manager institution north": {
+        return 33;
+      }
+
+      case "default": {
+        return -1;
+      }
+    }
+  };
+
+  const getProperName = (name) => {
+    let customName = "";
+
+    if (name.includes("/")) {
+      customName = name.substr(0, name.lastIndexOf("/")).trim();
+    } else {
+      customName = name;
+    }
+    return customName;
+  };
+
+  const getOriginalDepartment = (departmentID) => {
+    let departmentName = "Not Assigned";
+
+    if (departmentID != null) {
+      let OriginalDepartment = departmentsList.filter((department) => {
+        return department.id == departmentID;
+      });
+
+      departmentName = OriginalDepartment[0]?.name;
+    }
+
+    return departmentName;
+  };
+
+  const customUsers = (data) => {
+    const customData = [];
+
+    data.map((entry) => {
+      let customObject = {
+        email: entry.userPrincipalName,
+        name: getProperName(entry.displayName),
+        department:
+          entry.department != undefined
+            ? getDepartment(entry.department.toLowerCase())
+            : null,
+        initials: "",
+      };
+
+      customData.push(customObject);
+    });
+
+    //console.log(customData);
+
+    const finalList = customData.map((user) => {
+      return (user = {
+        ...user,
+        department: getOriginalDepartment(user.department),
+      });
+    });
+
+    console.log(finalList);
+  };
+
+  const readUploadFile = (e) => {
+    e.preventDefault();
+    if (e.target.files) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const data = e.target.result;
+        const workbook = xlsx.read(data, { type: "array" });
+        const sheetName = workbook.SheetNames[0];
+        const worksheet = workbook.Sheets[sheetName];
+        const json = xlsx.utils.sheet_to_json(worksheet);
+        customUsers(json);
+      };
+      reader.readAsArrayBuffer(e.target.files[0]);
+    }
+  };
+
   return (
     <div>
       <div
         style={{ background: "#EAEDED", width: "100%", padding: "30px 0px" }}
       >
+        {/* <form>
+          <label htmlFor="upload">Upload File</label>
+          <input
+            type="file"
+            name="upload"
+            id="upload"
+            onChange={readUploadFile}
+          />
+        </form> */}
         <div
           style={{
             padding: "10px 0px",
@@ -439,16 +818,22 @@ export default function DataGridDemo() {
               marginBottom: 50,
             }}
           >
-            <DataGrid
-              rows={tasks}
-              columns={columns}
-              pageSize={10}
-              rowHeight={100}
-              rowsPerPageOptions={[5]}
-              onCellClick={getRowID}
-              // checkboxSelection
-              disableSelectionOnClick
-            />
+            {loading ? (
+              <div style={{ textAlign: "center" }}>
+                <CircularProgress />
+              </div>
+            ) : (
+              <DataGrid
+                rows={tasks}
+                columns={columns}
+                pageSize={10}
+                rowHeight={100}
+                rowsPerPageOptions={[5]}
+                onCellClick={getRowID}
+                // checkboxSelection
+                disableSelectionOnClick
+              />
+            )}
           </div>
         </div>
       </div>

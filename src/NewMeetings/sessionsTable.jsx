@@ -13,6 +13,9 @@ import Notification from "../Generic/Notification";
 import DesktopDatePicker from "@mui/lab/DesktopDatePicker";
 import TextField from "@mui/material/TextField";
 import moment from "moment";
+import axios from "axios";
+import { BASE_URL } from "../config/productionConfig";
+import requestHeaders from "../_helpers/headers";
 
 const sureStyle = {
   position: "absolute",
@@ -46,10 +49,12 @@ export default function DataGridDemo(props) {
   const [newlyAddedSessionsIDs, setNewlyAddedSessionsIDs] = React.useState([]);
   const [dateChanged, setDateChanged] = React.useState(true);
   const [notificationState, setNotificationState] = React.useState(false);
+  const [notificationText, setNotificationText] = React.useState("");
+  const [notificationType, setNotificationType] = React.useState("");
   const [disableSave, setDisableSave] = React.useState(false);
   const [sure, setSure] = React.useState(false);
   const [selectedSessionID, setSelectedSessionID] = React.useState();
-  const [disableAgendas, setDisableAgendas] = React.useState(false)
+  const [disableAgendas, setDisableAgendas] = React.useState(false);
   const history = useHistory();
 
   React.useEffect(() => {
@@ -61,10 +66,10 @@ export default function DataGridDemo(props) {
   }, [props]);
 
   React.useEffect(() => {
-    if(!localStorage.getItem("meetingID")) {
-      setDisableAgendas(true)
+    if (!localStorage.getItem("meetingID")) {
+      setDisableAgendas(true);
     }
-  })
+  });
 
   React.useEffect(() => {
     var date = new Date();
@@ -123,7 +128,7 @@ export default function DataGridDemo(props) {
           display: "flex",
           flexWrap: "wrap",
           overflowY: "scroll",
-          height: participants.length <= 5 ? 'auto' : '90px',
+          height: participants.length <= 5 ? "auto" : "90px",
         }}
       >
         {!participants.length ? (
@@ -192,8 +197,12 @@ export default function DataGridDemo(props) {
 
     if (dateAlready.length) {
       setNotificationState(true);
+      setNotificationText("Session already added");
+      setNotificationType("error");
       setTimeout(() => {
         setNotificationState(false);
+        setNotificationText("");
+        setNotificationType("");
       }, 5000);
     } else {
       const updatedSessions = sessions.map((item) => {
@@ -341,10 +350,14 @@ export default function DataGridDemo(props) {
       setSessionDate(data);
       setDateChanged(true);
       setNotificationState(true);
+      setNotificationText("Session already added");
+      setNotificationType("error");
       setTimeout(() => {
         setNotificationState(false);
+        setNotificationText("");
+        setNotificationType("");
       }, 5000);
-    } else if(data != null) {
+    } else if (data != null) {
       setSessionDate(data);
       setDateChanged(false);
     }
@@ -361,12 +374,78 @@ export default function DataGridDemo(props) {
     });
 
     setSessions(updatedList);
-    props.getDeletedSession(selectedSessionID)
+    props.getDeletedSession(selectedSessionID);
     setSure(false);
   };
 
   const noDelete = () => {
     setSure(false);
+  };
+
+  const getPublish = (details) => {
+    if (Object.keys(details).length) {
+      if (details.locked == 0) {
+        return "Publish";
+      } else {
+        return "Published";
+      }
+    } else {
+      return "Publish";
+    }
+  };
+
+  const getPublishStatus = (details) => {
+    if (Object.keys(details).length) {
+      if (details.locked == 0) {
+        return false;
+      } else {
+        return true;
+      }
+    } else {
+      return true;
+    }
+  };
+
+  const publishMeeting = async () => {
+    const updatedMeeting = { ...props.details, locked: 1 };
+
+    const res = await axios.put(
+      `${BASE_URL}/meetings/${updatedMeeting.id}`,
+      updatedMeeting,
+      {
+        headers: requestHeaders,
+      }
+    );
+
+    console.log(res);
+
+    if (res?.status == 200) {
+      setNotificationText("Meeting has been published successfully!");
+      setNotificationState(true);
+      setNotificationType("success");
+      const meetingDetails = await axios.get(
+        `${BASE_URL}/meetings/${updatedMeeting.id}`,
+        {
+          headers: requestHeaders,
+        }
+      );
+      props.getDetails(meetingDetails.data);
+      setTimeout(() => {
+        setNotificationState(false);
+        setNotificationText("");
+        setNotificationType("");
+      }, 5000);
+    } else {
+      setNotificationText("Error");
+      setNotificationState(true);
+      setNotificationType("error");
+
+      setTimeout(() => {
+        setNotificationText("");
+        setNotificationState(false);
+        setNotificationType("");
+      }, 5000);
+    }
   };
 
   return (
@@ -379,7 +458,7 @@ export default function DataGridDemo(props) {
           display: "flex",
         }}
       >
-        <div style={{ width: "80%" }}>
+        <div style={{ width: "60%" }}>
           <h3>Session Date</h3>
           {/* <input
             style={{ padding: 10 }}
@@ -419,11 +498,11 @@ export default function DataGridDemo(props) {
             </p>
           )}
         </div>
-        <div style={{ width: "20%", position: "relative" }}>
+        <div style={{ width: "40%", position: "relative" }}>
           <Button
             onClick={goToAgendas}
             variant="contained"
-            style={{ position: "absolute", bottom: 0 }}
+            style={{ position: "absolute", bottom: 0, right: 125 }}
             disabled={disableAgendas}
           >
             {/* <Link
@@ -433,6 +512,26 @@ export default function DataGridDemo(props) {
               Add
             </Link> */}
             {getText(props.agendas)}
+          </Button>
+          <Button
+            onClick={publishMeeting}
+            variant="contained"
+            style={{
+              position: "absolute",
+              bottom: 0,
+              right: 0,
+              background: "green",
+              width: "115px",
+            }}
+            disabled={getPublishStatus(props.details)}
+          >
+            {/* <Link
+              to="/agendas"
+              style={{ textDecoration: "none", color: "#fff" }}
+            >
+              Add
+            </Link> */}
+            {getPublish(props.details)}
           </Button>
         </div>
       </div>
@@ -514,8 +613,8 @@ export default function DataGridDemo(props) {
       </div>
       <Notification
         open={notificationState}
-        text={"Session already added"}
-        type={"error"}
+        text={notificationText}
+        type={notificationType}
       />
     </div>
   );

@@ -18,6 +18,7 @@ const FilterSection = (props) => {
   const [departmentsList, setDepartmentsList] = React.useState([]);
   const [rows, setRows] = React.useState([]);
   const [usersList, setUsersList] = React.useState([]);
+  const [disableOperations, setDisableOperations] = React.useState(false);
 
   const statuses = [
     {
@@ -53,6 +54,20 @@ const FilterSection = (props) => {
     setStatus(props.filters.status);
     setAssignedDate(props.filters.assignedDate);
     setDueDate(props.filters.dueDate);
+  }, []);
+
+  React.useEffect(() => {
+    const user = localStorage.getItem("user");
+    const parsedUser = JSON.parse(user);
+
+    if (
+      parsedUser.id == 934 ||
+      parsedUser.id == 984 ||
+      parsedUser.id == 994 ||
+      parsedUser.id == 1054
+    ) {
+      setDisableOperations(true);
+    }
   }, []);
 
   React.useEffect(() => {
@@ -253,18 +268,24 @@ const FilterSection = (props) => {
           value={organizer}
           sx={{ width: "100%", marginTop: 2 }}
           onChange={(event, value) => setOrganizer(value)}
-          renderInput={(params) => <TextField {...params} label="Responsible Person" />}
+          renderInput={(params) => (
+            <TextField {...params} label="Responsible Person" />
+          )}
         />
 
-        <Autocomplete
-          disablePortal
-          id="combo-box-demo"
-          value={department}
-          options={departmentsList}
-          sx={{ width: "100%", marginTop: 2 }}
-          onChange={(event, value) => setDepartment(value)}
-          renderInput={(params) => <TextField {...params} label="Department" />}
-        />
+        {disableOperations && (
+          <Autocomplete
+            disablePortal
+            id="combo-box-demo"
+            value={department}
+            options={departmentsList}
+            sx={{ width: "100%", marginTop: 2 }}
+            onChange={(event, value) => setDepartment(value)}
+            renderInput={(params) => (
+              <TextField {...params} label="Department" />
+            )}
+          />
+        )}
 
         <FormControl fullWidth style={{ marginTop: 15 }}>
           <InputLabel id="demo-simple-select-label">Status</InputLabel>

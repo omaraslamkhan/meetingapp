@@ -150,6 +150,7 @@ const UpdateMeeting = () => {
   };
 
   const getMeetingSessions = async (data, newly) => {
+    const meetingID = localStorage.getItem("meetingID");
     const customSessions = data.map((item) => {
       item.startDate = new Date(item.startDate).toISOString();
       item.endDate = new Date(item.endDate).toISOString();
@@ -165,7 +166,7 @@ const UpdateMeeting = () => {
     //console.log(updatedMeeting)
 
     const res = await axios.put(
-      `${BASE_URL}/meetings/${meetingDetails.id}`,
+      `${BASE_URL}/meetings/${meetingID}`,
       updatedMeeting,
       {
         headers: requestHeaders,
@@ -177,6 +178,13 @@ const UpdateMeeting = () => {
       setNotificationText("Meeting has been updated successfully!");
       setNotificationState(true);
       setNotificationType("success");
+      const meetingDetails = await axios.get(
+        `${BASE_URL}/meetings/${meetingID}`,
+        {
+          headers: requestHeaders,
+        }
+      );
+      setMeetingDetails(meetingDetails.data);
       setTimeout(() => {
         setNotificationState(false);
       }, 5000);
@@ -210,6 +218,10 @@ const UpdateMeeting = () => {
 
     setSessions(updatedList);
   };
+
+  const getMeetingDetails = (details) => {
+    setMeetingDetails(details)
+  }
 
   return (
     <div>
@@ -285,6 +297,8 @@ const UpdateMeeting = () => {
             getSessions={meetingSessions}
             agendas={meetingDetails.agendas}
             getDeletedSession={getDeleted}
+            details={meetingDetails}
+            getDetails={getMeetingDetails}
           />
         </div>
       </div>

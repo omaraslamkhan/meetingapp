@@ -155,7 +155,7 @@ const CreateMeeting = () => {
     } else {
       setNotificationText("Error");
       setNotificationState(true);
-      setNotificationType("success");
+      setNotificationType("error");
 
       setTimeout(() => {
         setNotificationText("");
@@ -257,6 +257,7 @@ const CreateMeeting = () => {
             agendas={[]}
             participants={usersList}
             getDeletedSession={getDeleted}
+            details={{}}
           />
         </div>
       </div>

@@ -11,6 +11,7 @@ import Modal from "@mui/material/Modal";
 import Fade from "@mui/material/Fade";
 import FilterSection from "./filterSection";
 import { BASE_URL } from "../config/productionConfig";
+import CircularProgress from "@mui/material/CircularProgress";
 import FilterAltIcon from "@mui/icons-material/FilterAlt";
 import moment from "moment";
 
@@ -45,6 +46,7 @@ export default function DataGridDemo() {
   const [filterModal, setFilterModal] = React.useState(false);
   const [selectedMeetingID, setSelectedMeetingID] = React.useState();
   const [usersList, setUsersList] = React.useState([]);
+  const [loading, setLoading] = React.useState(true);
   const [departmentsList, setDepartmentsList] = React.useState([]);
   const [originalMeetings, setOriginalMeetings] = React.useState([]);
   const [currentFilters, setCurrentFilters] = React.useState({
@@ -76,7 +78,20 @@ export default function DataGridDemo() {
       "meetings?_end=100&_order=ASC&_sort=id&_start=0"
     );
 
-    setAllMeetings(fetchedMeetings.data);
+    const user = localStorage.getItem("user");
+    const parsedUser = JSON.parse(user);
+
+    if (parsedUser.hasAdminRights != false) {
+      const publishedMeetings = fetchedMeetings.data.filter((meeting) => {
+        return meeting.locked != 0;
+      });
+
+      setAllMeetings(publishedMeetings);
+    } else {
+      setAllMeetings(fetchedMeetings.data);
+    }
+
+    setLoading(false);
   };
 
   React.useEffect(() => {
@@ -90,12 +105,7 @@ export default function DataGridDemo() {
     setMeetings(allMeetings);
     setOriginalMeetings(allMeetings);
 
-    if (
-      parsedUser.id == 934 ||
-      parsedUser.id == 984 ||
-      parsedUser.id == 994 ||
-      parsedUser.id == 1054
-    ) {
+    if (parsedUser.hasAdminRights != false) {
       setDisableOperations(true);
     }
   }, [allMeetings]);
@@ -381,16 +391,22 @@ export default function DataGridDemo() {
               marginBottom: 50,
             }}
           >
-            <DataGrid
-              rows={meetings}
-              columns={columns}
-              pageSize={10}
-              rowHeight={50}
-              rowsPerPageOptions={[5]}
-              onCellClick={getRowID}
-              // checkboxSelection
-              disableSelectionOnClick
-            />
+            {loading ? (
+              <div style={{ textAlign: "center" }}>
+                <CircularProgress />
+              </div>
+            ) : (
+              <DataGrid
+                rows={meetings}
+                columns={columns}
+                pageSize={10}
+                rowHeight={50}
+                rowsPerPageOptions={[5]}
+                onCellClick={getRowID}
+                // checkboxSelection
+                disableSelectionOnClick
+              />
+            )}
           </div>
         </div>
       </div>
