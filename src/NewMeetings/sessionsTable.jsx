@@ -461,8 +461,10 @@ export default function DataGridDemo(props) {
 
   const saveAttachments = async () => {
     const uploads = await axios.post(`${BASE_URL}/upload`, formDatas, {
-      userid: localStorage.getItem("user") ? JSON.parse(localStorage.getItem("user")).id : '',
-      meetingId: ''
+      headers: {
+        userid: localStorage.getItem("user") ? JSON.parse(localStorage.getItem("user")).id : '',
+        meetingId: ''
+      }
     });
 
     console.log(uploads)
@@ -515,7 +517,9 @@ export default function DataGridDemo(props) {
           files.push(event.target.files[0])
           datas.push(formData)
           setAttachmentUploaded(!attachmentUploaded)
-          setAttachments(files)
+          if(!disableAttachments) {
+            setAttachments(files)
+          }
           setFormDatas(datas)
           setCurrentAttachment('')
           console.log(files)
@@ -575,21 +579,6 @@ export default function DataGridDemo(props) {
       <div style={{ width: "80%", paddingTop: 5 }}>{file.name}</div>
       <div style={{ width: "10%", paddingTop: 2 }}><CancelIcon onClick={() => removeAttachment(file)} style={{ cursor: 'pointer' }} /></div>
     </div>
-  }
-
-  const getAttachmentState = () => {
-    if (!disableAttachments && !attachments.length) {
-      //false and false
-      return true
-    } else if (!disableAttachments && attachments.length) {
-      //false and true
-      return true
-    } else if (disableAttachments && !attachments.length) {
-      //true and false
-      return true
-    } else {
-      return false
-    }
   }
 
   return (
@@ -660,7 +649,7 @@ export default function DataGridDemo(props) {
             </label>
             <input disabled={!localStorage.getItem("meetingID") ? true : false} id="file-upload" value={currentAttachment} type="file" style={{ display: 'none' }} onChange={getFile} />
             <Button
-              disabled={getAttachmentState}
+              disabled={attachments.length ? false : true}
               onClick={saveAttachments}
               style={{ marginLeft: 100, background: "green" }}
               variant="contained"
