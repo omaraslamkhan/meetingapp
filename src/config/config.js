@@ -1,5 +1,5 @@
 const config = {
-    baseUrl:'http://localhost:3004/'
+    baseUrl:'https://meeting.hiltonpharma.com:3004'
     
 };
 
