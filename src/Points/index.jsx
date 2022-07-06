@@ -135,10 +135,11 @@ export default function DataGridDemo() {
   }, [subOrdinateTasks]);
 
   const fetchMeetings = async () => {
-    const fetchedMeetings = await accountService.find(
-      "",
-      "meetings?_end=1000&_order=ASC&_sort=id&_start=0"
-    );
+    const fetchedMeetings = await axios.get(`${BASE_URL}/meetings?_end=1000&_order=ASC&_sort=id&_start=0`, {
+      headers: {
+        userid: 934,
+      }
+    });
 
     setAllMeetings(fetchedMeetings.data);
   };
