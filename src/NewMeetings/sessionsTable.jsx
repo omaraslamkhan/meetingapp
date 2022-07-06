@@ -463,7 +463,7 @@ export default function DataGridDemo(props) {
     const uploads = await axios.post(`${BASE_URL}/upload`, formDatas, {
       headers: {
         userid: localStorage.getItem("user") ? JSON.parse(localStorage.getItem("user")).id : '',
-        meetingId: ''
+        meetingId: localStorage.getItem("meetingID")
       }
     });
 
@@ -517,7 +517,7 @@ export default function DataGridDemo(props) {
           files.push(event.target.files[0])
           datas.push(formData)
           setAttachmentUploaded(!attachmentUploaded)
-          if(!disableAttachments) {
+          if (!disableAttachments) {
             setAttachments(files)
           }
           setFormDatas(datas)
