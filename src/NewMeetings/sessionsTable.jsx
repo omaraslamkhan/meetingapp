@@ -139,7 +139,7 @@ export default function DataGridDemo(props) {
           display: "flex",
           flexWrap: "wrap",
           overflowY: "scroll",
-          height: participants.length <= 5 ? "auto" : "90px",
+          height: participants.length <= 6 ? "auto" : "90px",
         }}
       >
         {!participants.length ? (
@@ -260,7 +260,7 @@ export default function DataGridDemo(props) {
     {
       field: "participants",
       headerName: <b>Participants</b>,
-      width: 790,
+      width: 870,
       disableColumnMenu: true,
       sortable: false,
       headerClassName: "super-app-theme--header",

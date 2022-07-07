@@ -15,6 +15,7 @@ export const meetingExporter = (selectedIds) => {
 export const MeetingToPDF = (props) => {
   const [meeting, setMeeting] = useState(null);
   const [participants, setParticipants] = useState(null);
+  const [finalParticipants, setFinalParticipants] = useState([])
 
   const sortParticipants = (participants) => {
     let orderedParticipants = Array.from(participants.values()).sort(function (
@@ -37,6 +38,65 @@ export const MeetingToPDF = (props) => {
     return orderedParticipants;
   };
 
+  const addAll = (participants) => {
+    let all = finalParticipants
+
+    let check = participants.filter((item) => {
+      return item.id != 934 && item.id != 994 && item.id != 984
+    })
+
+    check.map((item) => {
+      all.push(item)
+    })
+
+    setFinalParticipants(all)
+  }
+
+  const checkSHN = (participants) => {
+    let sortSHN = finalParticipants
+
+    let check = participants.filter((item) => {
+      return item.id === 994
+    })
+
+    if (check.length) {
+      sortSHN.push(check[0])
+    }
+
+    setFinalParticipants(sortSHN)
+    addAll(participants)
+  }
+
+  const checkSHD = (participants) => {
+    let sortSHD = finalParticipants
+
+    let check = participants.filter((item) => {
+      return item.id === 934
+    })
+
+    if (check.length) {
+      sortSHD.push(check[0])
+    }
+
+    setFinalParticipants(sortSHD)
+    checkSHN(participants)
+  }
+
+  const checkSHB = (participants) => {
+    let sortSHB = finalParticipants
+
+    let check = participants.filter((item) => {
+      return item.id === 984
+    })
+
+    if (check.length) {
+      sortSHB.push(check[0])
+    }
+
+    setFinalParticipants(sortSHB)
+    checkSHD(participants)
+  }
+
   useEffect(() => {
     const meetingId = props.match.params.meetingId;
     fetch(`${process.env.REACT_APP_URI}/meetings/report/` + meetingId)
@@ -49,6 +109,8 @@ export const MeetingToPDF = (props) => {
             );
           })
         );
+
+        const checkParticipants = []
 
         for (const session of meetingResp.sessions) {
           for (const participant of session.participants) {
@@ -79,8 +141,21 @@ export const MeetingToPDF = (props) => {
           })
         );
 
+        for (const value of customParticipants.values()) {
+          checkParticipants.push(value)
+        }
+
+        checkSHB(checkParticipants)
+        //console.log(finalParticipants)
+
+        const TajParticipants = new Map(
+          finalParticipants.map((participant) => {
+            return [participant.id, participant]
+          })
+        )
+
         setMeeting(meetingResp);
-        setParticipants(customParticipants);
+        setParticipants(TajParticipants);
       });
   }, []);
 
@@ -213,11 +288,9 @@ export const MeetingToPDF = (props) => {
                                 {`${agendaIdx + 1}.${taskIdx + 1}`}
                               </td>
                             )}
-                            <td className="task-text-col text">{`${
-                              agendaIdx + 1
-                            }.${taskIdx + 1}.${pointIdx + 1}. ${
-                              point.text
-                            }`}</td>
+                            <td className="task-text-col text">{`${agendaIdx + 1
+                              }.${taskIdx + 1}.${pointIdx + 1}. ${point.text
+                              }`}</td>
                             {pointIdx === 0 && (
                               <td
                                 rowSpan={task.points.length}
@@ -230,10 +303,9 @@ export const MeetingToPDF = (props) => {
                                   );
                                   return initials.reduce(
                                     (reponsiblePersonText, initial) =>
-                                      `${
-                                        reponsiblePersonText
-                                          ? reponsiblePersonText + " & "
-                                          : ""
+                                      `${reponsiblePersonText
+                                        ? reponsiblePersonText + " & "
+                                        : ""
                                       }${initial}`,
                                     ""
                                   );
