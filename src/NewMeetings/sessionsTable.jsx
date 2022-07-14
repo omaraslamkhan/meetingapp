@@ -139,7 +139,7 @@ export default function DataGridDemo(props) {
           display: "flex",
           flexWrap: "wrap",
           overflowY: "scroll",
-          height: participants.length <= 6 ? "auto" : "90px",
+          height: participants.length <= 5 ? "auto" : "90px",
         }}
       >
         {!participants.length ? (
@@ -260,7 +260,7 @@ export default function DataGridDemo(props) {
     {
       field: "participants",
       headerName: <b>Participants</b>,
-      width: 870,
+      width: 790,
       disableColumnMenu: true,
       sortable: false,
       headerClassName: "super-app-theme--header",
@@ -462,15 +462,26 @@ export default function DataGridDemo(props) {
   const saveAttachments = async () => {
     const uploads = await axios.post(`${BASE_URL}/upload`, formDatas, {
       headers: {
+        'content-type': 'multipart/form-data',
         userid: localStorage.getItem("user") ? JSON.parse(localStorage.getItem("user")).id : '',
-        meetingId: localStorage.getItem("meetingID")
+        meetingId: props.details?props.details.id:null
       }
-    });
+    }).then(resp=>{
+    console.log(resp)
+      setNotificationText("Files has been created successfully!");
+      setNotificationState(true);
+      setNotificationType("success");
+    }).catch(err=>{
+      setNotificationText("Error");
+      setNotificationState(true);
+      setNotificationType("error");
+    })
 
-    console.log(uploads)
+   
   }
 
   const getFile = (event) => {
+    event.preventDefault()
     let files = attachments
     let datas = formDatas
 
@@ -508,19 +519,20 @@ export default function DataGridDemo(props) {
           setNotificationType('error')
           setCurrentAttachment('')
         } else {
-          const formData = new FormData();
-          formData.append(
-            "file",
-            event.target.files[0],
-          );
+          // const formData = new FormData();
+          // formData.append(
+          //   "file",
+          //   event.target.files[0],
+          // );
 
           files.push(event.target.files[0])
-          datas.push(formData)
+          // datas.push(formData)
           setAttachmentUploaded(!attachmentUploaded)
-          if (!disableAttachments) {
+          if(!disableAttachments) {
             setAttachments(files)
           }
-          setFormDatas(datas)
+          
+          setFormDatas(files)
           setCurrentAttachment('')
           console.log(files)
         }
