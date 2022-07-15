@@ -17,4 +17,4 @@ ReactDOM.render(
   </React.StrictMode>,
   document.getElementById("root")
 );
-//registerServiceWorker();
+registerServiceWorker();
