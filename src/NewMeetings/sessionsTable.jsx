@@ -16,6 +16,7 @@ import moment from "moment";
 import axios from "axios";
 import { BASE_URL } from "../config/productionConfig";
 import requestHeaders from "../_helpers/headers";
+import DeleteIcon from '@mui/icons-material/Delete';
 
 const sureStyle = {
   position: "absolute",
@@ -69,6 +70,12 @@ export default function DataGridDemo(props) {
       setSessions(props.createMeetingSessions);
     }
   }, [props]);
+
+  React.useEffect(() => {
+    if (props?.details?.files?.length) {
+      setAttachments(props?.details?.files)
+    }
+  }, [props])
 
   React.useEffect(() => {
     if (!localStorage.getItem("meetingID")) {
@@ -464,20 +471,24 @@ export default function DataGridDemo(props) {
       headers: {
         'content-type': 'multipart/form-data',
         userid: localStorage.getItem("user") ? JSON.parse(localStorage.getItem("user")).id : '',
-        meetingId: props.details?props.details.id:null
+        meetingId: props.details ? props.details.id : null
       }
-    }).then(resp=>{
-    console.log(resp)
-      setNotificationText("Files has been created successfully!");
+    }).then(resp => {
+      console.log(resp)
+      setNotificationText("Files has been uploaded successfully!");
       setNotificationState(true);
       setNotificationType("success");
-    }).catch(err=>{
+    }).catch(err => {
       setNotificationText("Error");
       setNotificationState(true);
       setNotificationType("error");
     })
 
-   
+    setTimeout(() => {
+      setNotificationText("");
+      setNotificationState(false);
+      setNotificationType("");
+    }, 5000);
   }
 
   const getFile = (event) => {
@@ -506,6 +517,12 @@ export default function DataGridDemo(props) {
         setNotificationText('File too large')
         setNotificationType('error')
         setCurrentAttachment('')
+
+        setTimeout(() => {
+          setNotificationText("");
+          setNotificationState(false);
+          setNotificationType("");
+        }, 5000);
       } else {
 
         const existing = attachments.filter((item) => {
@@ -518,6 +535,12 @@ export default function DataGridDemo(props) {
           setNotificationText('File already uploaded')
           setNotificationType('error')
           setCurrentAttachment('')
+
+          setTimeout(() => {
+            setNotificationText("");
+            setNotificationState(false);
+            setNotificationType("");
+          }, 5000);
         } else {
           // const formData = new FormData();
           // formData.append(
@@ -528,10 +551,10 @@ export default function DataGridDemo(props) {
           files.push(event.target.files[0])
           // datas.push(formData)
           setAttachmentUploaded(!attachmentUploaded)
-          if(!disableAttachments) {
+          if (!disableAttachments) {
             setAttachments(files)
           }
-          
+
           setFormDatas(files)
           setCurrentAttachment('')
           console.log(files)
@@ -539,9 +562,16 @@ export default function DataGridDemo(props) {
       }
     } else {
       console.log('rejected')
+      setCurrentAttachment('')
       setNotificationState(true)
       setNotificationText('Invalid file format')
       setNotificationType('error')
+
+      setTimeout(() => {
+        setNotificationText("");
+        setNotificationState(false);
+        setNotificationType("");
+      }, 5000);
     }
   }
 
@@ -575,6 +605,36 @@ export default function DataGridDemo(props) {
     return <img style={{ width: 30 }} src={require(`../FileIcons/${type}.png`).default} />
   }
 
+  const getFileIconFromUrl = (file) => {
+    let type = ''
+
+    if (file.url.includes('txt')) {
+      type = 'txt'
+    } else if (file.url.includes('jpg')) {
+      type = 'jpg'
+    } else if (file.url.includes('jpeg')) {
+      type = 'jpg'
+    } else if (file.url.includes('xlsx')) {
+      type = 'xls'
+    } else if (file.url.includes('csv')) {
+      type = 'csv'
+    } else if (file.url.includes('png')) {
+      type = 'png'
+    } else if (file.url.includes('pdf')) {
+      type = 'pdf'
+    } else if (file.url.includes('docx')) {
+      type = 'doc'
+    } else if (file.url.includes('doc')) {
+      type = 'doc'
+    } else if (file.url.includes('zip')) {
+      type = 'zip'
+    } else if (file.url.includes('ppt')) {
+      type = 'ppt'
+    }
+
+    return <img style={{ width: 30 }} src={require(`../FileIcons/${type}.png`).default} />
+  }
+
   const removeAttachment = (file) => {
     let index = attachments.indexOf(file)
     let newAttachments = attachments
@@ -585,12 +645,49 @@ export default function DataGridDemo(props) {
     setAttachmentUploaded(!attachmentUploaded)
   }
 
+  const removeUrlAttachment = async (file) => {
+    let index = attachments.indexOf(file)
+    let newAttachments = attachments
+
+    newAttachments.splice(index, 1)
+    setCurrentAttachment('')
+    setAttachments(newAttachments)
+    setAttachmentUploaded(!attachmentUploaded)
+
+    var n = file.url.lastIndexOf('/');
+    let name = file.url.substring(n + 1);
+
+    const res = await axios.get(
+      `${BASE_URL}/files/remove/${name}/${file.id}`,
+      {
+        headers: requestHeaders,
+      }
+    );
+
+    console.log(res)
+  }
+
   const getFileElement = (file) => {
     return <div style={{ width: '95%', display: 'flex', padding: 5 }}>
       <div style={{ width: "10%" }}>{getFileIcon(file)}</div>
       <div style={{ width: "80%", paddingTop: 5 }}>{file.name}</div>
-      <div style={{ width: "10%", paddingTop: 2 }}><CancelIcon onClick={() => removeAttachment(file)} style={{ cursor: 'pointer' }} /></div>
+      <div style={{ width: "10%", paddingTop: 2 }}><DeleteIcon onClick={() => removeAttachment(file)} style={{ cursor: 'pointer', color: 'red' }} /></div>
     </div>
+  }
+
+  const getFileNameFromUrl = (url) => {
+    var n = url.lastIndexOf('-');
+    return url.substring(n + 1);
+  }
+
+  const getFileElementFromUrl = (file) => {
+    if (file.isActive == true) {
+      return <div style={{ width: '95%', display: 'flex', padding: 5 }}>
+        <div style={{ width: "10%" }}>{getFileIconFromUrl(file)}</div>
+        <div style={{ width: "80%", paddingTop: 5 }}><a href={file.url} target='_blank' download>{getFileNameFromUrl(file.url)}</a></div>
+        <div style={{ width: "10%", paddingTop: 2 }}><DeleteIcon onClick={() => removeUrlAttachment(file)} style={{ cursor: 'pointer', color: 'red' }} /></div>
+      </div>
+    }
   }
 
   return (
@@ -673,7 +770,11 @@ export default function DataGridDemo(props) {
               {attachments.length ?
                 <div style={{ width: '100%', height: '100%', overflowY: 'scroll', padding: 5 }}>
                   {attachments.map((item) => {
-                    return getFileElement(item)
+                    if (item.hasOwnProperty('url')) {
+                      return getFileElementFromUrl(item)
+                    } else {
+                      return getFileElement(item)
+                    }
                   })}
                 </div> :
                 <p style={{ fontSize: "12px" }}>

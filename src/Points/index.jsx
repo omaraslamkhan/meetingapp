@@ -244,25 +244,20 @@ export default function DataGridDemo() {
       disableColumnMenu: true,
       sortable: false,
       renderCell: (data) => (
-        <TextField
-          variant="standard"
-          multiline
-          value={data.row.meetingTitle}
-          InputProps={{
-            disableUnderline: true,
-            readOnly: true,
-            style: {
-              fontSize: 12,
-            },
-          }}
+        <a
+          href={`${window.location.origin}/reporting/${data.row.meeting}`}
+          target="_blank"
           style={{
+            textDecoration: 'none',
+            textAlign: 'left',
             height: "90px",
             width: "100%",
+            fontSize: 12,
             display: "flex",
             flexDirection: "column",
             justifyContent: "center",
           }}
-        />
+        >{data.row.meetingTitle}</a>
       ),
     },
     {
@@ -827,7 +822,7 @@ export default function DataGridDemo() {
               <DataGrid
                 rows={tasks}
                 columns={columns}
-                pageSize={10}
+                pageSize={5}
                 rowHeight={100}
                 rowsPerPageOptions={[5]}
                 onCellClick={getRowID}
