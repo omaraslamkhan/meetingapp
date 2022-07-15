@@ -3,3 +3,4 @@
 /.env.local
 /src/config/productionConfig.js
 /.env.development
+/.history

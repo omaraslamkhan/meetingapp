@@ -2,7 +2,7 @@
   "name": "meeting-frontend",
   "version": "1.0.0",
   "description": "",
-  "homepage": "https://meetings-hpl.herokuapp.com/",
+  "homepage": ".",
   "main": "index.js",
   "dependencies": {
     "@azure/msal-browser": "^2.22.0",
