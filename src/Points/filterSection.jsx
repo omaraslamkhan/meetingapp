@@ -60,12 +60,7 @@ const FilterSection = (props) => {
     const user = localStorage.getItem("user");
     const parsedUser = JSON.parse(user);
 
-    if (
-      parsedUser.id == 934 ||
-      parsedUser.id == 984 ||
-      parsedUser.id == 994 ||
-      parsedUser.id == 1054
-    ) {
+    if (parsedUser.hasAdminRights == true) {
       setDisableOperations(true);
     }
   }, []);
@@ -189,7 +184,13 @@ const FilterSection = (props) => {
         return item.statusID == status;
       });
     } else {
-      filteredStatus = data;
+      if(status == 0) {
+        filteredStatus = data.filter((item) => {
+          return item.statusID == status;
+        });
+      } else {
+        filteredStatus = data;
+      }
     }
 
     filterAssignedDate(filteredStatus);
@@ -294,7 +295,7 @@ const FilterSection = (props) => {
             id="demo-simple-select"
             value={status}
             label="Status"
-            onChange={(event) => setStatus(event.target.value)}
+            onChange={(event, value) => setStatus(event.target.value)}
           >
             {statuses.map((item) => {
               return <MenuItem value={item.id}>{item.name}</MenuItem>;
