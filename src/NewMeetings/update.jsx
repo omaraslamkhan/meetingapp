@@ -300,6 +300,8 @@ const UpdateMeeting = () => {
             details={meetingDetails}
             getDetails={getMeetingDetails}
           />
+
+          
         </div>
       </div>
       <Notification
