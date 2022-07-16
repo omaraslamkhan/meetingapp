@@ -1,10 +1,9 @@
 {
   "name": "meeting-frontend",
+  "homepage": ".",
   "version": "1.0.0",
   "description": "",
-  "homepage": ".",
   "main": "index.js",
-  "proxy": "http://localhost:3000",
 
   "dependencies": {
     "@azure/msal-browser": "^2.22.0",
