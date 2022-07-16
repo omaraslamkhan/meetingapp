@@ -1,6 +1,6 @@
 {
   "name": "meeting-frontend",
-  "homepage": "/",
+  "homepage": "https://meetings-hpl.herokuapp.com/",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
